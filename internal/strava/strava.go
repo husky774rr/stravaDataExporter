@@ -29,6 +29,22 @@ type Client struct {
 	Logger       *slog.Logger
 }
 
+// IsAuthenticated checks if the client has a valid access token.
+func (c *Client) IsAuthenticated() bool {
+	return c.AccessToken != ""
+}
+
+// Example of a handler that requires authentication.
+func (c *Client) AuthRequiredHandler(next http.HandlerFunc) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		if !c.IsAuthenticated() {
+			http.Redirect(w, r, "/auth/login", http.StatusFound)
+			return
+		}
+		next(w, r)
+	}
+}
+
 func NewClient(cfg *config.Config, db any) *Client {
 	logger := slog.New(slog.NewJSONHandler(os.Stdout, nil))
 	return &Client{cfg: cfg, Logger: logger}
