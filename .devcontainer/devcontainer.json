@@ -1,0 +1,23 @@
+{
+    "name": "stravaDataExporter",
+    "build": {
+        "dockerfile": "Dockerfile",
+        "args": {
+            "VARIANT": "1.24",
+            "GO_VERSION": "1.24.3"
+        }
+    },
+    "features": {},
+    "customizations": {
+        "vscode": {
+            "settings": {
+                "go.useLanguageServer": true
+            },
+            "extensions": [
+                "golang.Go"
+            ]
+        }
+    },
+    "postCreateCommand": "go mod tidy",
+    "remoteUser": "vscode"
+}
