@@ -2,6 +2,7 @@ package strava
 import (
 	"fmt"
 	"net/http"
+	"net/url"
 	"stravaDataExporter/internal/config"
 )
 type Client struct {
@@ -12,11 +13,17 @@ func NewClient(cfg *config.Config, db any) *Client {
 }
 func HandleOAuthCallback(c *Client) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		fmt.Fprintln(w, "OAuth callback")
+		fmt.Fprintln(w, "OAuth callback received")
 	}
 }
 func HandleLogin(cfg *config.Config) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		fmt.Fprintln(w, "Redirect to Strava OAuth")
+		redirectURL := "http://localhost:8080/auth/callback"
+		stravaAuthURL := fmt.Sprintf(
+			"https://www.strava.com/oauth/authorize?client_id=%s&response_type=code&redirect_uri=%s&approval_prompt=auto&scope=activity:read_all",
+			cfg.StravaClientID,
+			url.QueryEscape(redirectURL),
+		)
+		http.Redirect(w, r, stravaAuthURL, http.StatusFound)
 	}
 }
