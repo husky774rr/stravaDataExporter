@@ -11,13 +11,18 @@ import (
 
 func main() {
 	cfg := config.Load()
-	db, err := influxdb.NewClient(cfg)
+	dbClient, err := influxdb.NewClient(cfg)
 	if err != nil {
 		log.Fatalf("InfluxDB connection failed: %v", err)
 	}
-	stravaClient := strava.NewClient(cfg, db)
-	go scheduler.StartHourlyFetch(stravaClient)
-	go scheduler.StartDailyTokenRefresh(stravaClient)
+	stravaClient := strava.NewClient(cfg, &dbClient)
+	if err := stravaClient.LoadFTPHistoricalData(); err != nil {
+		log.Fatalf("Failed to load FTP historical data: %v", err)
+	}
+
+	go scheduler.StartRegularlyFetch(stravaClient)
+	go scheduler.StartAccessTokenRefresh(stravaClient)
+
 	http.HandleFunc("/auth/callback", strava.HandleOAuthCallback(stravaClient))
 	http.HandleFunc("/auth/login", strava.HandleLogin(cfg))
 	http.HandleFunc("/", stravaClient.AuthRequiredHandler(nil))

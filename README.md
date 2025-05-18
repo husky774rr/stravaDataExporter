@@ -13,6 +13,13 @@
 - GitHubActionsでビルド
 - 自宅サーバのUbuntu24.04LTSで運用
 - 開発はVSCode + devContainer
+- 成果物
+    - 全機能実装済みの.goファイル軍
+    - `go mod init stravaDataExporter` 実行済みの go.modファイル
+    - gihubActionsでのビルド向け実装済みファイル郡
+    - docker compose 向け compose.yaml と .env
+    - .devcontainer, devcontainer.json
+    - デバッグ起動可能な.vscode/launch.json
 
 ## 実装機能
 

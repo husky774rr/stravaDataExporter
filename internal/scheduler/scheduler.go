@@ -6,16 +6,29 @@ import (
 	"stravaDataExporter/internal/strava"
 )
 
-func StartHourlyFetch(c *strava.Client) {
+func StartRegularlyFetch(c *strava.Client) {
 	go func() {
 		for {
-			c.Logger.Info("Fetching data from Strava (not implemented)")
-			time.Sleep(time.Hour)
+			c.Logger.Info("Waik up and fetch data from Strava. Start StartRegularlyFetch")
+
+			if c.IsAuthenticated() {
+				if err := c.FetchActivities(); err != nil {
+					c.Logger.Error("failed to fetch activities", "error", err)
+				} else {
+					c.Logger.Info("activities fetched successfully")
+				}
+			} else {
+				c.Logger.Info("client is not authenticated, skipping fetch")
+			}
+
+			c.Logger.Info("Sleep for next Fetching. Finish StartRegularlyFetch")
+			// time.Sleep(time.Hour)
+			time.Sleep(time.Minute)
 		}
 	}()
 }
 
-func StartDailyTokenRefresh(c *strava.Client) {
+func StartAccessTokenRefresh(c *strava.Client) {
 	go func() {
 		for {
 			err := c.RefreshAccessToken()
@@ -25,7 +38,6 @@ func StartDailyTokenRefresh(c *strava.Client) {
 				c.Logger.Info("access token refreshed successfully (scheduled)")
 			}
 			time.Sleep(24 * time.Hour)
-			// time.Sleep(1 * time.Minute) // For testing purposes, refresh every minute
 		}
 	}()
 }
